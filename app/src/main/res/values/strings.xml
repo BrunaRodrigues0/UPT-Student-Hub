@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">UPT Student Hub</string>
+    <string name="timetable_label">Timetable</string>
+
+    <!-- MainActivity -->
+    <string name="welcome_title">Welcome to UPT Student Hub</string>
+    <string name="hint_student_name">Student name</string>
+    <string name="btn_open_timetable">Open my timetable</string>
+    <string name="error_name_required">Please enter your name</string>
+
+    <!-- TimetableActivity -->
+    <string name="timetable_title">Timetable of %1$s</string>
+    <string name="btn_sync">Sync timetable</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_tap">Tap me (%1$d)</string>
+    <string name="status_idle">Ready to sync</string>
+    <string name="status_running">Syncing... %1$d%%</string>
+    <string name="status_done">Sync complete: %1$d sessions</string>
+    <string name="status_cancelled">Sync cancelled</string>
+    <string name="cd_progress">Timetable synchronisation progress</string>
+    <string name="msg_blocked">The UI thread was blocked for 6 seconds</string>
+
+    <!-- Menus and dialog -->
+    <string name="menu_clear">Clear</string>
+    <string name="menu_block_ui">Block UI (bad practice)</string>
+    <string name="menu_about">About</string>
+    <string name="about_title">About</string>
+    <string name="about_message">UPT Student Hub — Module 1-3\nLaboratório de Aplicações Móveis — 2026/2027\nAluno nº 50410</string>
+    <string name="ok">OK</string>
+
+    <!-- Simulated server data -->
+    <string-array name="sessions">
+        <item>Mon 09:00 — Mobile Applications Lab</item>
+        <item>Mon 14:00 — Databases</item>
+        <item>Tue 10:00 — Software Engineering</item>
+        <item>Wed 11:00 — Computer Networks</item>
+        <item>Thu 16:00 — Artificial Intelligence</item>
+        <item>Fri 09:30 — Operating Systems</item>
+    </string-array>
+</resources>

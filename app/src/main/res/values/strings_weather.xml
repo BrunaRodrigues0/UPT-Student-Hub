@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MainActivity -->
+    <string name="btn_open_weather">Campus weather</string>
+
+    <!-- WeatherActivity -->
+    <string name="weather_label">Campus weather</string>
+    <string name="weather_title">Hi %1$s — weather at UPT campus</string>
+    <string name="weather_location">Porto — Universidade Portucalense</string>
+    <string name="cb_auto_refresh">Refresh automatically when back online</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="banner_offline">You are offline</string>
+    <string name="cd_weather_progress">Loading weather data</string>
+
+    <string name="status_weather_idle">Tap Refresh to get the weather</string>
+    <string name="status_loading">Contacting the weather server...</string>
+    <string name="status_success">Updated at %1$s</string>
+
+    <string name="err_no_connection">No connection to the server. Check your network.</string>
+    <string name="err_timeout">The server took too long to answer.</string>
+    <string name="err_http">The server answered with error %1$d.</string>
+    <string name="err_parse">The server sent data we could not read.</string>
+
+    <string name="temp_value">%1$.1f °C</string>
+    <string name="humidity_value">Humidity: %1$d%%</string>
+    <string name="wind_value">Wind: %1$.1f km/h</string>
+
+    <string name="toast_airplane_on">Airplane mode ON — network disabled</string>
+    <string name="toast_airplane_off">Airplane mode OFF</string>
+    <string name="toast_back_online">Back online — refreshing...</string>
+    <string name="toast_main_thread">NetworkOnMainThreadException: network calls are not allowed on the main thread</string>
+
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_main_thread">Fetch on main thread (bad practice)</string>
+    <string name="menu_server_error">Simulate server error</string>
+
+    <!-- WMO codes -->
+    <string name="wmo_clear">Clear sky</string>
+    <string name="wmo_mainly_clear">Mainly clear</string>
+    <string name="wmo_partly_cloudy">Partly cloudy</string>
+    <string name="wmo_overcast">Overcast</string>
+    <string name="wmo_fog">Fog</string>
+    <string name="wmo_drizzle">Drizzle</string>
+    <string name="wmo_rain">Rain</string>
+    <string name="wmo_snow">Snow</string>
+    <string name="wmo_showers">Rain showers</string>
+    <string name="wmo_snow_showers">Snow showers</string>
+    <string name="wmo_thunderstorm">Thunderstorms</string>
+    <string name="wmo_unknown">Unknown conditions</string>
+</resources>
