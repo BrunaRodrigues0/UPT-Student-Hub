@@ -30,9 +30,11 @@ public class MainActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         Button btnOpenTimetable = findViewById(R.id.btnOpenTimetable);
         Button btnOpenWeather = findViewById(R.id.btnOpenWeather);
+        Button btnOpenExplorer = findViewById(R.id.btnOpenExplorer);
 
         btnOpenTimetable.setOnClickListener(v -> openWith(TimetableActivity.class));
         btnOpenWeather.setOnClickListener(v -> openWith(WeatherActivity.class));
+        btnOpenExplorer.setOnClickListener(v -> openWith(ExplorerActivity.class));
     }
 
     /** Valida o nome (Week 3) e abre o ecrã alvo com o nome como extra (Week 4). */

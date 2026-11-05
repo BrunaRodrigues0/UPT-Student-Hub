@@ -34,6 +34,30 @@
             android:exported="false"
             android:label="@string/weather_label"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".ExplorerActivity"
+            android:exported="false"
+            android:label="@string/explorer_label"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".DetailActivity"
+            android:exported="false"
+            android:label="@string/detail_label"
+            android:parentActivityName=".ExplorerActivity" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_label"
+            android:parentActivityName=".ExplorerActivity" />
+
+        <activity
+            android:name=".CompareActivity"
+            android:exported="false"
+            android:label="@string/compare_label"
+            android:parentActivityName=".ExplorerActivity" />
     </application>
 
 </manifest>

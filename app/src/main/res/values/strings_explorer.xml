@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MainActivity (novo botão) -->
+    <string name="btn_open_explorer">Explorer</string>
+
+    <!-- Labels das activities (manifest) -->
+    <string name="explorer_label">Explorer</string>
+    <string name="detail_label">Detail</string>
+    <string name="settings_label">Settings</string>
+    <string name="compare_label">Compare</string>
+
+    <!-- ExplorerActivity -->
+    <string name="explorer_greeting">Hi %1$s — weekly forecast</string>
+    <string name="explorer_location">Porto — Universidade Portucalense</string>
+    <string name="status_idle_explorer">Ready to load the forecast</string>
+    <string name="status_loading_explorer">Loading forecast…</string>
+    <string name="status_success_explorer">Loaded %1$d days</string>
+    <string name="status_empty_explorer">No forecast data available</string>
+    <string name="status_error_explorer">Could not load the forecast</string>
+    <string name="status_cancelled_explorer">Request cancelled</string>
+
+    <!-- Botões e menu -->
+    <string name="btn_cancel_request">Cancel</string>
+    <string name="menu_location">Porto (UPT campus)</string>
+    <string name="menu_compare">Compare</string>
+    <string name="menu_settings">Settings</string>
+
+    <!-- Banner offline -->
+    <string name="banner_offline_explorer">You are offline</string>
+
+    <!-- Mensagens de erro (RF16) -->
+    <string name="err_no_connection_explorer">No connection to the server. Check your network.</string>
+    <string name="err_timeout_explorer">The server took too long to answer.</string>
+    <string name="err_http_explorer">The server answered with error %1$d.</string>
+    <string name="err_parse_explorer">The server sent data we could not read.</string>
+    <string name="err_empty_explorer">The server returned no results.</string>
+
+    <!-- Favoritos -->
+    <string name="favorite_add">Mark as favourite</string>
+    <string name="favorite_remove">Remove from favourites</string>
+    <string name="favorite_added_toast">Added to favourites</string>
+    <string name="favorite_removed_toast">Removed from favourites</string>
+    <string name="favorite_remove_confirm_title">Remove favourite?</string>
+    <string name="favorite_remove_confirm_message">This day will no longer be marked as a favourite.</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <!-- Item da lista (dias) -->
+    <string name="day_max_temp">Max: %1$.1f °C</string>
+    <string name="day_min_temp">Min: %1$.1f °C</string>
+    <string name="day_rain_prob">Rain: %1$d%%</string>
+
+    <!-- DetailActivity -->
+    <string name="detail_title">Hourly forecast — %1$s</string>
+    <string name="detail_hour_temp">%1$s · %2$.1f °C</string>
+    <string name="detail_hour_rain">Rain probability: %1$d%%</string>
+    <string name="detail_card_hint">Hour-by-hour weather for the selected day.</string>
+
+    <!-- SettingsActivity -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_unit">Temperature unit</string>
+    <string name="settings_unit_celsius">Celsius (°C)</string>
+    <string name="settings_unit_fahrenheit">Fahrenheit (°F)</string>
+    <string name="settings_days">Number of days</string>
+    <string name="settings_days_3">3 days</string>
+    <string name="settings_days_5">5 days</string>
+    <string name="settings_days_7">7 days</string>
+    <string name="settings_rain_threshold">Rain alert threshold (%)</string>
+    <string name="settings_rain_threshold_hint">0–100</string>
+    <string name="settings_refresh_interval">Auto-refresh interval (seconds)</string>
+    <string name="settings_refresh_interval_hint">60–3600</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_error_threshold">Enter a number between 0 and 100</string>
+    <string name="settings_error_interval">Enter a number between 60 and 3600</string>
+    <string name="settings_saved_toast">Settings saved</string>
+
+    <!-- CompareActivity -->
+    <string name="compare_title">Compare cities</string>
+    <string name="compare_porto">Porto</string>
+    <string name="compare_lisboa">Lisboa</string>
+    <string name="compare_faro">Faro</string>
+    <string name="compare_loading">Loading…</string>
+    <string name="compare_error">Failed: %1$s</string>
+    <string name="compare_max_temp">Max: %1$.1f °C</string>
+    <string name="compare_min_temp">Min: %1$.1f °C</string>
+    <string name="compare_rain">Rain: %1$d%%</string>
+
+    <!-- Menu About (reutiliza about_title/about_message do Módulo 1) -->
+
+    <!-- Atualização periódica -->
+    <string name="toast_battery_low">Battery low — periodic refresh paused</string>
+    <string name="toast_battery_okay">Battery OK — periodic refresh resumed</string>
+
+    <!-- Códigos WMO (Módulo 2 já tem; reaproveitamos os mesmos nomes) -->
+</resources>

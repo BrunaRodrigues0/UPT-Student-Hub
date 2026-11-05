@@ -40,4 +40,13 @@
         android:layout_marginTop="@dimen/spacing_s"
         android:minHeight="@dimen/touch_target"
         android:text="@string/btn_open_weather" />
+
+    <Button
+        android:id="@+id/btnOpenExplorer"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_s"
+        android:minHeight="@dimen/touch_target"
+        android:text="@string/btn_open_explorer" />
 </LinearLayout>

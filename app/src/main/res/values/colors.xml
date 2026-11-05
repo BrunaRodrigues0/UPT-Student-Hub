@@ -4,4 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="upt_navy">#0B2A4A</color>
     <color name="upt_light">#DCE9F5</color>
+    <color name="upt_accent">#1E88E5</color>
+    <color name="upt_error">#B00020</color>
+    <color name="aqi_good">#2E7D32</color>
+    <color name="aqi_bad">#C62828</color>
 </resources>
