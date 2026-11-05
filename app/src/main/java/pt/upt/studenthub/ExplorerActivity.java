@@ -1,30 +1,44 @@
 package pt.upt.studenthub;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
+
 /**
- * Ecrã principal do Módulo 3 «Explorer» (versão mínima da FASE 3).
- * Lista, estados e botão Cancelar. O menu e a paisagem vêm nas fases seguintes.
+ * Ecrã principal do Módulo 3 «Explorer» (versão final da FASE 4).
+ * Lista, estados, menu, Up, cancelamento e log de ciclo de vida.
+ * A paisagem de dois painéis, NetworkCallback, BroadcastReceiver e atualização periódica vêm nas FASES 6–8.
  */
 public class ExplorerActivity extends AppCompatActivity {
 
-    private ExplorerViewModel viewModel;
+    private static final String TAG = "ExplorerActivity";
 
-    private TextView tvStatus;
+    private ExplorerViewModel viewModel;
+    private TextView tvStatus, tvOffline;
     private ProgressBar progressBar;
-    private Button btnRefresh;
-    private Button btnCancel;
+    private Button btnRefresh, btnCancel;
+    private ListView listView;
+    private ItemAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_explorer);
 
         if (getSupportActionBar() != null) {
@@ -38,31 +52,57 @@ public class ExplorerActivity extends AppCompatActivity {
         tvGreeting.setText(getString(R.string.explorer_greeting, name));
 
         tvStatus = findViewById(R.id.tvStatus);
+        tvOffline = findViewById(R.id.tvOffline);
         progressBar = findViewById(R.id.progressBar);
         btnRefresh = findViewById(R.id.btnRefresh);
         btnCancel = findViewById(R.id.btnCancel);
+        listView = findViewById(R.id.listView);
+
+        adapter = new ItemAdapter(this, new ArrayList<>());
+        listView.setAdapter(adapter);
 
         viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
 
         btnRefresh.setOnClickListener(v -> viewModel.load());
         btnCancel.setOnClickListener(v -> viewModel.cancel());
 
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            DailyForecast d = adapter.getItem(position);
+            if (d != null) {
+                Intent i = new Intent(this, DetailActivity.class);
+                i.putExtra(DetailActivity.EXTRA_DATE, d.date);
+                startActivity(i);
+            }
+        });
+
         viewModel.getStatus().observe(this, this::renderStatus);
         viewModel.getError().observe(this, type -> {
             if (type != null) tvStatus.setText(errorMessage(type));
         });
-        viewModel.getLastHttpCode().observe(this, code -> {
-            // nada a fazer aqui, o erro já mostra o texto
-        });
         viewModel.getDaily().observe(this, list -> {
-            // na FASE 4 isto liga ao ItemAdapter
+            adapter.clear();
+            if (list != null) adapter.addAll(list);
+            adapter.notifyDataSetChanged();
+            // recomeça a animação de entrada sempre que a lista muda
+            listView.scheduleLayoutAnimation();
         });
+        viewModel.getFavourites().observe(this, favs -> adapter.setFavourites(favs));
 
-        // Primeiro carregamento automático (RF3), só se ainda não foi feito
         if (viewModel.getStatus().getValue() == ExplorerViewModel.Status.IDLE) {
             viewModel.load();
         }
     }
+
+    @Override
+    protected void onStart() { super.onStart(); Log.d(TAG, "onStart"); }
+    @Override
+    protected void onResume() { super.onResume(); Log.d(TAG, "onResume"); }
+    @Override
+    protected void onPause() { Log.d(TAG, "onPause"); super.onPause(); }
+    @Override
+    protected void onStop() { Log.d(TAG, "onStop"); super.onStop(); }
+    @Override
+    protected void onDestroy() { Log.d(TAG, "onDestroy"); super.onDestroy(); }
 
     private void renderStatus(ExplorerViewModel.Status s) {
         boolean loading = s == ExplorerViewModel.Status.LOADING;
@@ -71,26 +111,18 @@ public class ExplorerActivity extends AppCompatActivity {
         btnCancel.setEnabled(loading);
 
         switch (s) {
-            case IDLE:
-                tvStatus.setText(R.string.status_idle_explorer);
+            case IDLE:      tvStatus.setText(R.string.status_idle_explorer); break;
+            case LOADING:   tvStatus.setText(R.string.status_loading_explorer); break;
+            case SUCCESS: {
+                int n = adapter.getCount();
+                tvStatus.setText(getString(R.string.status_success_explorer, n));
                 break;
-            case LOADING:
-                tvStatus.setText(R.string.status_loading_explorer);
-                break;
-            case SUCCESS:
-                tvStatus.setText(getString(R.string.status_success_explorer,
-                        viewModel.getDaily().getValue() == null ? 0 : viewModel.getDaily().getValue().size()));
-                break;
-            case EMPTY:
-                tvStatus.setText(R.string.status_empty_explorer);
-                break;
-            case CANCELLED:
-                tvStatus.setText(R.string.status_cancelled_explorer);
-                break;
-            case ERROR:
-                tvStatus.setText(R.string.status_error_explorer);
-                break;
+            }
+            case EMPTY:     tvStatus.setText(R.string.status_empty_explorer); break;
+            case CANCELLED: tvStatus.setText(R.string.status_cancelled_explorer); break;
+            case ERROR:     tvStatus.setText(R.string.status_error_explorer); break;
         }
+        invalidateOptionsMenu();
     }
 
     private String errorMessage(ExplorerViewModel.ErrorType type) {
@@ -100,5 +132,45 @@ public class ExplorerActivity extends AppCompatActivity {
             case PARSE:   return getString(R.string.err_parse_explorer);
             default:      return getString(R.string.err_no_connection_explorer);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_explorer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean loading = viewModel.getStatus().getValue() == ExplorerViewModel.Status.LOADING;
+        menu.findItem(R.id.action_refresh).setEnabled(!loading);
+        menu.findItem(R.id.action_compare).setEnabled(!loading);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            viewModel.load();
+            return true;
+        }
+        if (id == R.id.action_compare) {
+            startActivity(new Intent(this, CompareActivity.class));
+            return true;
+        }
+        if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        if (id == R.id.action_about) {
+            AboutDialog.show(this);
+            return true;
+        }
+        if (id == R.id.action_location_porto) {
+            item.setChecked(true);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_refresh"
+        android:title="@string/menu_refresh"
+        android:icon="@drawable/ic_refresh"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_location"
+        android:title="@string/menu_location"
+        android:icon="@drawable/ic_location"
+        app:showAsAction="ifRoom" />
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/action_location_porto"
+            android:title="Porto (UPT campus)"
+            android:checkable="true"
+            android:checked="true" />
+        <!-- Nesta variante há só um local para o pedido A; podes adicionar outros -->
+    </group>
+
+    <item
+        android:id="@+id/action_compare"
+        android:title="@string/menu_compare"
+        android:icon="@drawable/ic_compare"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/menu_settings"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_about"
+        android:title="@string/menu_about"
+        android:icon="@drawable/ic_about"
+        app:showAsAction="never" />
+</menu>
