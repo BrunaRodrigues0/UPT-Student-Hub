@@ -10,8 +10,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -34,6 +36,27 @@ public class ExplorerActivity extends AppCompatActivity {
     private Button btnRefresh, btnCancel;
     private ListView listView;
     private ItemAdapter adapter;
+
+    private final androidx.activity.result.ActivityResultLauncher<Intent> detailLauncher =
+            registerForActivityResult(
+                    new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            String date = result.getData().getStringExtra(DetailActivity.RESULT_DATE);
+                            boolean fav  = result.getData().getBooleanExtra(DetailActivity.RESULT_FAVOURITE, false);
+                            if (date != null) {
+                                boolean currently = viewModel.getFavourites().getValue() != null
+                                        && viewModel.getFavourites().getValue().contains(date);
+                                if (currently != fav) {
+                                    viewModel.toggleFavourite(date);
+                                    Toast.makeText(this,
+                                            fav ? R.string.favorite_added_toast
+                                                    : R.string.favorite_removed_toast,
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +94,30 @@ public class ExplorerActivity extends AppCompatActivity {
             if (d != null) {
                 Intent i = new Intent(this, DetailActivity.class);
                 i.putExtra(DetailActivity.EXTRA_DATE, d.date);
-                startActivity(i);
+                boolean isFav = viewModel.getFavourites().getValue() != null
+                        && viewModel.getFavourites().getValue().contains(d.date);
+                i.putExtra(DetailActivity.EXTRA_FAVOURITE, isFav);
+                detailLauncher.launch(i);
             }
+        });
+
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            DailyForecast d = adapter.getItem(position);
+            if (d == null) return false;
+            boolean isFav = viewModel.getFavourites().getValue() != null
+                    && viewModel.getFavourites().getValue().contains(d.date);
+            if (!isFav) return false;
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.favorite_remove_confirm_title)
+                    .setMessage(R.string.favorite_remove_confirm_message)
+                    .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                        viewModel.toggleFavourite(d.date);
+                        Toast.makeText(this, R.string.favorite_removed_toast, Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton(R.string.dialog_cancel, null)
+                    .show();
+            return true;
         });
 
         viewModel.getStatus().observe(this, this::renderStatus);

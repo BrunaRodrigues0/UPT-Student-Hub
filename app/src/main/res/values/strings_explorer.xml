@@ -55,6 +55,11 @@
     <string name="detail_hour_temp">%1$s · %2$.1f °C</string>
     <string name="detail_hour_rain">Rain probability: %1$d%%</string>
     <string name="detail_card_hint">Hour-by-hour weather for the selected day.</string>
+    <string name="detail_status_loading">Loading hourly forecast…</string>
+    <string name="detail_status_success">Loaded %1$d hours</string>
+    <string name="detail_status_empty">No hourly data for this day</string>
+    <string name="detail_status_error">Could not load hourly forecast</string>
+    <string name="detail_hour_rain_alert">%1$s · %2$.1f °C · %3$d%% rain (alert)</string>
 
     <!-- SettingsActivity -->
     <string name="settings_title">Settings</string>

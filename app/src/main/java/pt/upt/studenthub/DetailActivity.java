@@ -1,19 +1,44 @@
 package pt.upt.studenthub;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import java.util.List;
 
 /**
- * Detalhe de um dia (pedido B da V1: horas do dia escolhido).
- * Nesta fase só mostra a data; a UI completa e o favorito vêm na FASE 5.
+ * Detalhe de um dia (pedido B da V1).
+ * Devolve o estado do favorito à ExplorerActivity via setResult (RF6).
  */
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_DATE = "pt.upt.studenthub.EXTRA_DATE";
+    public static final String EXTRA_FAVOURITE = "pt.upt.studenthub.EXTRA_FAVOURITE";
+    public static final String RESULT_DATE = "pt.upt.studenthub.RESULT_DATE";
+    public static final String RESULT_FAVOURITE = "pt.upt.studenthub.RESULT_FAVOURITE";
+
     private static final String TAG = "DetailActivity";
+
+    private ExplorerViewModel viewModel;
+    private String date;
+    private boolean favourite;
+
+    private TextView tvTitle, tvStatus;
+    private ProgressBar progressBar;
+    private Button btnFavourite;
+    private View card;
+    private LinearLayout hoursContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +50,133 @@ public class DetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        String date = getIntent().getStringExtra(EXTRA_DATE);
+        date = getIntent().getStringExtra(EXTRA_DATE);
         if (date == null) date = "";
+        favourite = getIntent().getBooleanExtra(EXTRA_FAVOURITE, false);
 
-        TextView tvTitle = findViewById(R.id.tvDetailTitle);
+        tvTitle = findViewById(R.id.tvDetailTitle);
+        tvStatus = findViewById(R.id.tvDetailStatus);
+        progressBar = findViewById(R.id.detailProgress);
+        btnFavourite = findViewById(R.id.btnToggleFavourite);
+        card = findViewById(R.id.detailCard);
+        hoursContainer = findViewById(R.id.hoursContainer);
+
         tvTitle.setText(getString(R.string.detail_title, date));
+        updateFavouriteButton();
+
+        viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
+
+        btnFavourite.setOnClickListener(v -> {
+            favourite = !favourite;
+            updateFavouriteButton();
+            Toast.makeText(this,
+                    favourite ? R.string.favorite_added_toast : R.string.favorite_removed_toast,
+                    Toast.LENGTH_SHORT).show();
+        });
+
+        viewModel.getStatus().observe(this, this::renderStatus);
+        viewModel.getError().observe(this, type -> {
+            if (type != null) tvStatus.setText(errorMessage(type));
+        });
+        viewModel.getHourly().observe(this, this::renderHours);
+
+        // Pedido B só se ainda não foi feito
+        if (viewModel.getStatus().getValue() == ExplorerViewModel.Status.IDLE) {
+            viewModel.loadDetail(date);
+        }
+    }
+
+    private void updateFavouriteButton() {
+        btnFavourite.setText(favourite ? R.string.favorite_remove : R.string.favorite_add);
+    }
+
+    private void renderStatus(ExplorerViewModel.Status s) {
+        boolean loading = s == ExplorerViewModel.Status.LOADING;
+        progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+        switch (s) {
+            case IDLE:
+                tvStatus.setText(R.string.status_idle_explorer);
+                break;
+            case LOADING:
+                tvStatus.setText(R.string.detail_status_loading);
+                break;
+            case SUCCESS: {
+                List<HourlyForecast> h = viewModel.getHourly().getValue();
+                tvStatus.setText(getString(R.string.detail_status_success,
+                        h == null ? 0 : h.size()));
+                break;
+            }
+            case EMPTY:
+                tvStatus.setText(R.string.detail_status_empty);
+                break;
+            case CANCELLED:
+                tvStatus.setText(R.string.status_cancelled_explorer);
+                break;
+            case ERROR:
+                tvStatus.setText(R.string.detail_status_error);
+                break;
+        }
+    }
+
+    private String errorMessage(ExplorerViewModel.ErrorType type) {
+        switch (type) {
+            case TIMEOUT: return getString(R.string.err_timeout_explorer);
+            case HTTP:    return getString(R.string.err_http_explorer, viewModel.getLastHttpCode().getValue());
+            case PARSE:   return getString(R.string.err_parse_explorer);
+            default:      return getString(R.string.err_no_connection_explorer);
+        }
+    }
+
+    /** Constrói as linhas das horas dentro do cartão, com animação de entrada. */
+    private void renderHours(List<HourlyForecast> hours) {
+        if (hours == null || hours.isEmpty()) {
+            card.setVisibility(View.GONE);
+            return;
+        }
+        hoursContainer.removeAllViews();
+
+        ExplorerViewModel.Settings s = viewModel.getSettings().getValue();
+        int threshold = s == null ? 30 : s.rainThreshold;
+        int pad = getResources().getDimensionPixelSize(R.dimen.spacing_xs);
+
+        for (HourlyForecast h : hours) {
+            TextView tv = new TextView(this);
+            if (h.rainProbability >= threshold) {
+                tv.setText(getString(R.string.detail_hour_rain_alert,
+                        h.hour(), h.temperature, h.rainProbability));
+                tv.setTextColor(getResources().getColor(R.color.upt_error, getTheme()));
+            } else {
+                tv.setText(getString(R.string.detail_hour_temp, h.hour(), h.temperature)
+                        + " · " + getString(WeatherCodes.describe(h.weatherCode))
+                        + " · " + getString(R.string.detail_hour_rain, h.rainProbability));
+            }
+            tv.setMinHeight(getResources().getDimensionPixelSize(R.dimen.touch_target));
+            tv.setPadding(0, pad, 0, pad);
+            hoursContainer.addView(tv);
+        }
+
+        card.setVisibility(View.VISIBLE);
+        card.startAnimation(AnimationUtils.loadAnimation(this, R.anim.item_enter));
+    }
+
+    @Override
+    public void onBackPressed() {
+        sendResultAndFinish();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        sendResultAndFinish();
+        return true;
+    }
+
+    /** Devolve sempre o estado do favorito à Explorer (RF6). */
+    private void sendResultAndFinish() {
+        Intent result = new Intent();
+        result.putExtra(RESULT_DATE, date);
+        result.putExtra(RESULT_FAVOURITE, favourite);
+        setResult(RESULT_OK, result);
+        finish();
     }
 
     @Override protected void onStart() { super.onStart(); Log.d(TAG, "onStart"); }
