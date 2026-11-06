@@ -32,14 +32,17 @@ public class ExplorerViewModel extends ViewModel {
     // --- Definições da V1 (valores por defeito) ---
     public static final class Settings {
         public final boolean fahrenheit;
-        public final int days;              // 3, 5 ou 7
-        public final int rainThreshold;     // 0..100
+        public final int days;               // 3, 5 ou 7
+        public final int rainThreshold;      // 0..100
+        public final boolean autoRefresh;    // liga/desliga a atualização periódica (RF14)
         public final int refreshIntervalSec; // segundos
 
-        public Settings(boolean fahrenheit, int days, int rainThreshold, int refreshIntervalSec) {
+        public Settings(boolean fahrenheit, int days, int rainThreshold,
+                        boolean autoRefresh, int refreshIntervalSec) {
             this.fahrenheit = fahrenheit;
             this.days = days;
             this.rainThreshold = rainThreshold;
+            this.autoRefresh = autoRefresh;
             this.refreshIntervalSec = refreshIntervalSec;
         }
     }
@@ -61,7 +64,7 @@ public class ExplorerViewModel extends ViewModel {
     // Favoritos e definições (em memória — persistem só até fechar a app, como o enunciado pede)
     private final MutableLiveData<Set<String>> favourites = new MutableLiveData<>(Collections.emptySet());
     private final MutableLiveData<Settings> settings = new MutableLiveData<>(
-            new Settings(false, 7, 30, 300));
+            new Settings(false, 7, 30, true, 300));
 
     private Future<?> currentTask;
 
@@ -80,10 +83,11 @@ public class ExplorerViewModel extends ViewModel {
         if (status.getValue() == Status.LOADING) return;
 
         Settings s = settings.getValue();
-        if (s == null) s = new Settings(false, 7, 30, 300);
+        if (s == null) s = new Settings(false, 7, 30, true, 300);
 
         final int days = s.days;
-        final String url = ExplorerApi.dailyUrl(ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, days);
+        final String url = ExplorerApi.dailyUrl(
+                ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, days, s.fahrenheit);
 
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {
@@ -124,7 +128,9 @@ public class ExplorerViewModel extends ViewModel {
     public void loadDetail(String isoDate) {
         if (status.getValue() == Status.LOADING) return;
 
-        final String url = ExplorerApi.hourlyUrl(ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, isoDate);
+        final String url = ExplorerApi.hourlyUrl(
+                ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, isoDate,
+                settings.getValue() != null && settings.getValue().fahrenheit);
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {
             try {

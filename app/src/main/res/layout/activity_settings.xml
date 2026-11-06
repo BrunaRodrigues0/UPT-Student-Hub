@@ -1,13 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="@dimen/spacing_m">
+    android:fitsSystemWindows="true">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings_title"
-        android:textAppearance="?attr/textAppearanceTitleLarge" />
-</LinearLayout>
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_m">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_title"
+            android:textAppearance="?attr/textAppearanceTitleLarge" />
+
+        <!-- 1) Unidade -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:text="@string/settings_unit"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+        <RadioGroup
+            android:id="@+id/rgUnit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rbCelsius"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/settings_unit_celsius" />
+
+            <RadioButton
+                android:id="@+id/rbFahrenheit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/settings_unit_fahrenheit" />
+        </RadioGroup>
+
+        <!-- 2) Número de dias -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:text="@string/settings_days"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+        <RadioGroup
+            android:id="@+id/rgDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbDays3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/settings_days_3" />
+
+            <RadioButton
+                android:id="@+id/rbDays5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/settings_days_5" />
+
+            <RadioButton
+                android:id="@+id/rbDays7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:minHeight="@dimen/touch_target"
+                android:text="@string/settings_days_7" />
+        </RadioGroup>
+
+        <!-- 3) Limiar de chuva -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:text="@string/settings_rain_threshold"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+        <EditText
+            android:id="@+id/etRainThreshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="none"
+            android:hint="@string/settings_rain_threshold_hint"
+            android:inputType="number"
+            android:minHeight="@dimen/touch_target" />
+
+        <!-- 4) CheckBox de auto-refresh -->
+        <CheckBox
+            android:id="@+id/cbAutoRefresh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:checked="true"
+            android:minHeight="@dimen/touch_target"
+            android:text="@string/cb_auto_refresh" />
+
+        <!-- 5) Intervalo de atualização -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:text="@string/settings_refresh_interval"
+            android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+        <EditText
+            android:id="@+id/etRefreshInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="none"
+            android:hint="@string/settings_refresh_interval_hint"
+            android:inputType="number"
+            android:minHeight="@dimen/touch_target" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:minHeight="@dimen/touch_target"
+            android:text="@string/settings_save" />
+    </LinearLayout>
+</ScrollView>

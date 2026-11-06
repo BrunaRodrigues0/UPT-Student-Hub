@@ -37,6 +37,7 @@ public class ExplorerActivity extends AppCompatActivity {
     private ListView listView;
     private ItemAdapter adapter;
 
+    // ---- Launchers (declarados como campos da classe) ----
     private final androidx.activity.result.ActivityResultLauncher<Intent> detailLauncher =
             registerForActivityResult(
                     new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
@@ -55,6 +56,29 @@ public class ExplorerActivity extends AppCompatActivity {
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
+                        }
+                    });
+
+    private final androidx.activity.result.ActivityResultLauncher<Intent> settingsLauncher =
+            registerForActivityResult(
+                    new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                            Intent d = result.getData();
+                            ExplorerViewModel.Settings current = viewModel.getSettings().getValue();
+                            int interval = d.getIntExtra(SettingsActivity.EXTRA_REFRESH_SEC,
+                                    current == null ? 300 : current.refreshIntervalSec);
+                            ExplorerViewModel.Settings s = new ExplorerViewModel.Settings(
+                                    d.getBooleanExtra(SettingsActivity.EXTRA_FAHRENHEIT, false),
+                                    d.getIntExtra(SettingsActivity.EXTRA_DAYS, 7),
+                                    d.getIntExtra(SettingsActivity.EXTRA_RAIN, 30),
+                                    d.getBooleanExtra(SettingsActivity.EXTRA_AUTO_REFRESH, true),
+                                    interval
+                            );
+                            viewModel.setSettings(s);
+                            Toast.makeText(this, R.string.settings_saved_toast, Toast.LENGTH_SHORT).show();
+                            viewModel.load();
+                            schedulePeriodicRefresh(s);
                         }
                     });
 
@@ -205,7 +229,16 @@ public class ExplorerActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            ExplorerViewModel.Settings s = viewModel.getSettings().getValue();
+            Intent i = new Intent(this, SettingsActivity.class);
+            if (s != null) {
+                i.putExtra(SettingsActivity.EXTRA_FAHRENHEIT, s.fahrenheit);
+                i.putExtra(SettingsActivity.EXTRA_DAYS, s.days);
+                i.putExtra(SettingsActivity.EXTRA_RAIN, s.rainThreshold);
+                i.putExtra(SettingsActivity.EXTRA_AUTO_REFRESH, s.autoRefresh);
+                i.putExtra(SettingsActivity.EXTRA_REFRESH_SEC, s.refreshIntervalSec);
+            }
+            settingsLauncher.launch(i);
             return true;
         }
         if (id == R.id.action_about) {
@@ -217,5 +250,10 @@ public class ExplorerActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /** Será ligado ao Handler.postDelayed na FASE 8 (RF14). */
+    private void schedulePeriodicRefresh(ExplorerViewModel.Settings s) {
+        // TODO FASE 8
     }
 }
