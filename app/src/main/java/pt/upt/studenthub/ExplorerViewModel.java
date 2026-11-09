@@ -195,7 +195,9 @@ public class ExplorerViewModel extends ViewModel {
             comparePool.submit(() -> {
                 CompareResult r;
                 try {
-                    String url = ExplorerApi.dailyUrl(coords[idx][0], coords[idx][1], 1);
+                    ExplorerViewModel.Settings s = settings.getValue();
+                    boolean fah = s != null && s.fahrenheit;
+                    String url = ExplorerApi.dailyUrl(coords[idx][0], coords[idx][1], 1, fah);
                     String body = HttpClient.get(url);
                     List<DailyForecast> data = ExplorerParser.parseDaily(body);
                     r = new CompareResult(labels[idx], data, null, 0);

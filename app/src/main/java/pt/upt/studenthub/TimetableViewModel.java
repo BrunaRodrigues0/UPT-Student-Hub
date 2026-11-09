@@ -15,8 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Sobrevive a mudanças de configuração (rotação). Responsável pelo trabalho em segundo plano.
- * REGRA: sem referências para Activity, View ou Context aqui.
+ * Survives configuration changes (rotation). Owns the background work.
+ * RULE: no references to Activity, View or Context here.
  */
 public class TimetableViewModel extends ViewModel {
 
@@ -24,10 +24,10 @@ public class TimetableViewModel extends ViewModel {
 
     private static final long SIMULATED_DELAY_MS = 800;
 
-    /** Pool de threads de trabalho (uma thread, tarefas em ordem). */
+    /** Worker thread pool (one thread, tasks in order). */
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    /** Ponte de regresso à thread da UI. */
+    /** Bridge back to the UI thread. */
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private final MutableLiveData<State> state = new MutableLiveData<>(State.IDLE);
@@ -42,19 +42,19 @@ public class TimetableViewModel extends ViewModel {
     public LiveData<List<String>> getSessions() { return sessions; }
 
     /**
-     * Chamado na thread da UI. Inicia a transferência simulada.
+     * Called on the UI thread. Starts the simulated download.
      */
     public void startSync(String[] source) {
         if (state.getValue() == State.RUNNING) {
-            return; // já em execução: nunca iniciar duas vezes
+            return; // already running: never start twice
         }
         sessions.setValue(Collections.emptyList());
         progress.setValue(0);
         state.setValue(State.RUNNING);
 
         currentTask = executor.submit(() -> {
-            // ---------- THREAD DE TRABALHO ----------
-            List<String> loaded = new ArrayList<>(); // confinado a esta thread
+            // ---------- WORKER THREAD ----------
+            List<String> loaded = new ArrayList<>(); // confined to this thread
             try {
                 for (int i = 0; i < source.length; i++) {
                     if (Thread.currentThread().isInterrupted()) {
@@ -68,21 +68,21 @@ public class TimetableViewModel extends ViewModel {
                     final int pct = (i + 1) * 100 / source.length;
 
                     mainHandler.post(() -> {
-                        // ---------- THREAD DA UI ----------
+                        // ---------- UI THREAD ----------
                         sessions.setValue(snapshot);
                         progress.setValue(pct);
                     });
                 }
                 mainHandler.post(() -> state.setValue(State.DONE));
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // restaura a flag
+                Thread.currentThread().interrupt(); // restore the flag
                 mainHandler.post(() -> state.setValue(State.CANCELLED));
             }
         });
     }
 
     /**
-     * Cancelamento cooperativo: interrompe a thread de trabalho.
+     * Cooperative cancellation: interrupts the worker thread.
      */
     public void cancelSync() {
         if (currentTask != null) {
@@ -90,7 +90,7 @@ public class TimetableViewModel extends ViewModel {
         }
     }
 
-    /** Reinicia tudo. Ignorado enquanto a sincronização está em execução. */
+    /** Resets everything. Ignored while a sync is running. */
     public void clear() {
         if (state.getValue() == State.RUNNING) {
             return;
@@ -100,7 +100,7 @@ public class TimetableViewModel extends ViewModel {
         state.setValue(State.IDLE);
     }
 
-    /** Chamado apenas quando o ecrã termina definitivamente (não na rotação). */
+    /** Called only when the screen is finished for good (not on rotation). */
     @Override
     protected void onCleared() {
         cancelSync();

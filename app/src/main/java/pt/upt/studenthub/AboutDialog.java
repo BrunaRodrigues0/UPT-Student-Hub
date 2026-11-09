@@ -5,13 +5,13 @@ import android.content.Context;
 import androidx.appcompat.app.AlertDialog;
 
 /**
- * Mostra a caixa de diálogo "Sobre". Usada por ambas as atividades (evita duplicação).
+ * Shows the "About" dialog. Used by both activities (avoids duplication).
  */
 public final class AboutDialog {
 
     private AboutDialog() { }
 
-    /** Mostra a caixa de diálogo "Sobre" no contexto fornecido. */
+    /** Shows the About dialog on top of the given context. */
     public static void show(Context context) {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.about_title)
