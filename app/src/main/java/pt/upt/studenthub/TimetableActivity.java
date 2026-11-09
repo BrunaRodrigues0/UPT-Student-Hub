@@ -108,7 +108,7 @@ public class TimetableActivity extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
-    /** Adds only the new sessions; each one enters with an XML animation. */
+    /** Adiciona apenas as novas sessões; cada uma entra com uma animação XML. */
     private void renderSessions(List<String> items) {
         if (items.size() < sessionsContainer.getChildCount()) {
             sessionsContainer.removeAllViews();
@@ -132,7 +132,7 @@ public class TimetableActivity extends AppCompatActivity {
         outState.putInt(KEY_TAPS, taps);
     }
 
-    // ------------------- Options Menu -------------------
+    // ------------------- Menu de Opções -------------------
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -164,9 +164,9 @@ public class TimetableActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /** X BAD PRACTICE - demonstration only (jank / ANR / StrictMode). */
+    /** MÁ PRÁTICA — apenas demonstração (jank / ANR / StrictMode). */
     private void blockUiThreadOnPurpose() {
-        StrictMode.noteSlowCall("Blocking the UI thread on purpose");
+        StrictMode.noteSlowCall("Bloqueando a thread principal de propósito");
         try {
             Thread.sleep(6000);
         } catch (InterruptedException e) {
