@@ -96,6 +96,7 @@
     <!-- Atualização periódica -->
     <string name="toast_battery_low">Battery low — periodic refresh paused</string>
     <string name="toast_battery_okay">Battery OK — periodic refresh resumed</string>
+    <string name="toast_back_online_explorer">Back online — refreshing…</string>
 
     <!-- Códigos WMO (Módulo 2 já tem; reaproveitamos os mesmos nomes) -->
 </resources>
