@@ -1,10 +1,12 @@
 package pt.upt.studenthub;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.List;
 import java.util.Locale;
@@ -26,10 +28,17 @@ public class CompareActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        viewModel = new androidx.lifecycle.ViewModelProvider(this).get(ExplorerViewModel.class);
+        viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
 
         // O callback da ViewModel corre na main thread (mainHandler.post lá dentro)
         viewModel.compare(this::renderResults);
+
+        Button btnSimulate = findViewById(R.id.btnSimulateFailure);
+        btnSimulate.setOnClickListener(v -> {
+            TextView status = findViewById(R.id.tvCompareStatus);
+            status.setText(R.string.compare_loading);
+            viewModel.compare(true, this::renderResults);
+        });
     }
 
     private void renderResults(@NonNull ExplorerViewModel.CompareResult[] results) {

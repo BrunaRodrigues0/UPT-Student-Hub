@@ -143,5 +143,14 @@
                     android:textColor="@color/upt_navy" />
             </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSimulateFailure"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_l"
+            android:minHeight="@dimen/touch_target"
+            android:text="Simular Falha Parcial (T11 - Erro em Lisboa)" />
     </LinearLayout>
 </ScrollView>

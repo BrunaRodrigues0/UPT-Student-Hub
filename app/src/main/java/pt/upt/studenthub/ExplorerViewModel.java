@@ -201,11 +201,7 @@ public class ExplorerViewModel extends ViewModel {
         }
     }
 
-    /**
-     * Corre três pedidos em paralelo com um pool fixo de 3 threads.
-     * Usa submit() (não invokeAll) para entregar cada resultado assim que fica pronto.
-     */
-    public void compare(LiveDataCallback callback) {
+    public void compare(boolean simulateFailure, LiveDataCallback callback) {
         status.setValue(Status.LOADING);
         final int total = 3;
         final int[] completed = {0};
@@ -225,7 +221,12 @@ public class ExplorerViewModel extends ViewModel {
                 try {
                     Settings s = settings.getValue();
                     boolean fah = s != null && s.fahrenheit;
-                    String url = ExplorerApi.dailyUrl(coords[idx][0], coords[idx][1], 1, fah);
+                    String url;
+                    if (idx == 1 && simulateFailure) {
+                        url = "https://api.open-meteo.com/v1/forecast-broken-url-for-test-t11";
+                    } else {
+                        url = ExplorerApi.dailyUrl(coords[idx][0], coords[idx][1], 1, fah);
+                    }
                     String body = HttpClient.get(url);
                     List<DailyForecast> data = ExplorerParser.parseDaily(body);
                     r = new CompareResult(labels[idx], data, null, 0);
@@ -249,6 +250,14 @@ public class ExplorerViewModel extends ViewModel {
                 });
             });
         }
+    }
+
+    /**
+     * Corre três pedidos em paralelo com um pool fixo de 3 threads.
+     * Usa submit() (não invokeAll) para entregar cada resultado assim que fica pronto.
+     */
+    public void compare(LiveDataCallback callback) {
+        compare(false, callback);
     }
 
     /** Callback para a Activity receber os três resultados. */
