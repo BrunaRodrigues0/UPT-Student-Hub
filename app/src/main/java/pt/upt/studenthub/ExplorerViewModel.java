@@ -81,6 +81,24 @@ public class ExplorerViewModel extends ViewModel {
     public LiveData<String> getStudentName() { return studentName; }
     public void setStudentName(String name) { studentName.setValue(name); }
 
+    public static final class LocationInfo {
+        public final String name;
+        public final double lat;
+        public final double lon;
+
+        public LocationInfo(String name, double lat, double lon) {
+            this.name = name;
+            this.lat = lat;
+            this.lon = lon;
+        }
+    }
+
+    private static final MutableLiveData<LocationInfo> selectedLocation = new MutableLiveData<>(
+            new LocationInfo("Porto (UPT campus)", ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON));
+
+    public LiveData<LocationInfo> getSelectedLocation() { return selectedLocation; }
+    public void setSelectedLocation(LocationInfo loc) { selectedLocation.setValue(loc); }
+
     // ---------- LISTA (pedido A) ----------
     /** Chamado na UI thread. Carrega os dias com as definições atuais. */
     public void load() {
@@ -89,9 +107,12 @@ public class ExplorerViewModel extends ViewModel {
         Settings s = settings.getValue();
         if (s == null) s = new Settings(false, 7, 30, true, 300);
 
+        LocationInfo loc = selectedLocation.getValue();
+        if (loc == null) loc = new LocationInfo("Porto (UPT campus)", ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON);
+
         final int days = s.days;
         final String url = ExplorerApi.dailyUrl(
-                ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, days, s.fahrenheit);
+                loc.lat, loc.lon, days, s.fahrenheit);
 
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {
@@ -132,8 +153,11 @@ public class ExplorerViewModel extends ViewModel {
     public void loadDetail(String isoDate) {
         if (status.getValue() == Status.LOADING) return;
 
+        LocationInfo loc = selectedLocation.getValue();
+        if (loc == null) loc = new LocationInfo("Porto (UPT campus)", ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON);
+
         final String url = ExplorerApi.hourlyUrl(
-                ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON, isoDate,
+                loc.lat, loc.lon, isoDate,
                 settings.getValue() != null && settings.getValue().fahrenheit);
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {

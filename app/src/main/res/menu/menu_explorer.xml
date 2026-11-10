@@ -8,19 +8,20 @@
         android:icon="@drawable/ic_refresh"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/action_location"
-        android:title="@string/menu_location"
-        android:icon="@drawable/ic_location"
-        app:showAsAction="ifRoom" />
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/action_location_porto"
-            android:title="Porto (UPT campus)"
+            android:title="@string/loc_porto"
             android:checkable="true"
             android:checked="true" />
-        <!-- Nesta variante há só um local para o pedido A; podes adicionar outros -->
+        <item
+            android:id="@+id/action_location_lisboa"
+            android:title="@string/loc_lisboa"
+            android:checkable="true" />
+        <item
+            android:id="@+id/action_location_faro"
+            android:title="@string/loc_faro"
+            android:checkable="true" />
     </group>
 
     <item

@@ -21,6 +21,9 @@
 
     <!-- Botões e menu -->
     <string name="btn_cancel_request">Cancel</string>
+    <string name="loc_porto">Porto (UPT campus)</string>
+    <string name="loc_lisboa">Lisboa</string>
+    <string name="loc_faro">Faro</string>
     <string name="menu_location">Porto (UPT campus)</string>
     <string name="menu_compare">Compare</string>
     <string name="menu_settings">Settings</string>

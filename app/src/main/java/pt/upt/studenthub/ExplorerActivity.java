@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -271,6 +272,18 @@ public class ExplorerActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
+
+        // Verificar o estado atual da bateria logo ao arrancar
+        Intent batteryStatus = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (batteryStatus != null) {
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            if (scale > 0) {
+                float pct = (level * 100f) / scale;
+                batteryLow = (pct <= 15.0f);
+            }
+        }
+
         // Bateria
         IntentFilter batteryFilter = new IntentFilter();
         batteryFilter.addAction(Intent.ACTION_BATTERY_LOW);
@@ -424,6 +437,21 @@ public class ExplorerActivity extends AppCompatActivity {
         boolean loading = viewModel.getStatus().getValue() == ExplorerViewModel.Status.LOADING;
         menu.findItem(R.id.action_refresh).setEnabled(!loading);
         menu.findItem(R.id.action_compare).setEnabled(!loading);
+
+        ExplorerViewModel.LocationInfo loc = viewModel.getSelectedLocation().getValue();
+        if (loc != null) {
+            menu.findItem(R.id.action_location_porto).setChecked(false);
+            menu.findItem(R.id.action_location_lisboa).setChecked(false);
+            menu.findItem(R.id.action_location_faro).setChecked(false);
+
+            if (loc.name.contains("Porto")) {
+                menu.findItem(R.id.action_location_porto).setChecked(true);
+            } else if (loc.name.contains("Lisboa")) {
+                menu.findItem(R.id.action_location_lisboa).setChecked(true);
+            } else if (loc.name.contains("Faro")) {
+                menu.findItem(R.id.action_location_faro).setChecked(true);
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -446,7 +474,24 @@ public class ExplorerActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_about) { AboutDialog.show(this); return true; }
-        if (id == R.id.action_location_porto) { item.setChecked(true); return true; }
+        if (id == R.id.action_location_porto) {
+            item.setChecked(true);
+            viewModel.setSelectedLocation(new ExplorerViewModel.LocationInfo("Porto (UPT campus)", ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON));
+            viewModel.load();
+            return true;
+        }
+        if (id == R.id.action_location_lisboa) {
+            item.setChecked(true);
+            viewModel.setSelectedLocation(new ExplorerViewModel.LocationInfo("Lisboa", ExplorerApi.LISBOA_LAT, ExplorerApi.LISBOA_LON));
+            viewModel.load();
+            return true;
+        }
+        if (id == R.id.action_location_faro) {
+            item.setChecked(true);
+            viewModel.setSelectedLocation(new ExplorerViewModel.LocationInfo("Faro", ExplorerApi.FARO_LAT, ExplorerApi.FARO_LON));
+            viewModel.load();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }
