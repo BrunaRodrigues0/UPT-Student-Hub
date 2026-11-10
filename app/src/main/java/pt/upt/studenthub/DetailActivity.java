@@ -68,11 +68,22 @@ public class DetailActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
 
         btnFavourite.setOnClickListener(v -> {
-            favourite = !favourite;
-            updateFavouriteButton();
-            Toast.makeText(this,
-                    favourite ? R.string.favorite_added_toast : R.string.favorite_removed_toast,
-                    Toast.LENGTH_SHORT).show();
+            if (favourite) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.favorite_remove_confirm_title)
+                        .setMessage(R.string.favorite_remove_confirm_message)
+                        .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                            favourite = false;
+                            updateFavouriteButton();
+                            Toast.makeText(this, R.string.favorite_removed_toast, Toast.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton(R.string.dialog_cancel, null)
+                        .show();
+            } else {
+                favourite = true;
+                updateFavouriteButton();
+                Toast.makeText(this, R.string.favorite_added_toast, Toast.LENGTH_SHORT).show();
+            }
         });
 
         viewModel.getStatus().observe(this, this::renderStatus);

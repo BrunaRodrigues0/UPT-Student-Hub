@@ -183,8 +183,24 @@ public class ExplorerActivity extends AppCompatActivity {
             btnPanelFavourite = findViewById(R.id.btnPanelFavourite);
             btnPanelFavourite.setOnClickListener(v -> {
                 if (!selectedDate.isEmpty()) {
-                    viewModel.toggleFavourite(selectedDate);
-                    updatePanelFavourite();
+                    boolean isFav = viewModel.getFavourites().getValue() != null
+                            && viewModel.getFavourites().getValue().contains(selectedDate);
+                    if (isFav) {
+                        new AlertDialog.Builder(this)
+                                .setTitle(R.string.favorite_remove_confirm_title)
+                                .setMessage(R.string.favorite_remove_confirm_message)
+                                .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                                    viewModel.toggleFavourite(selectedDate);
+                                    updatePanelFavourite();
+                                    Toast.makeText(this, R.string.favorite_removed_toast, Toast.LENGTH_SHORT).show();
+                                })
+                                .setNegativeButton(R.string.dialog_cancel, null)
+                                .show();
+                    } else {
+                        viewModel.toggleFavourite(selectedDate);
+                        updatePanelFavourite();
+                        Toast.makeText(this, R.string.favorite_added_toast, Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         }
