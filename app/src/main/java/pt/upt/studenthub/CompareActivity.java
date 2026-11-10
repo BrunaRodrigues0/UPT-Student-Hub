@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Comparação de Porto, Lisboa e Faro com três pedidos em paralelo (RF9).
@@ -73,10 +74,14 @@ public class CompareActivity extends AppCompatActivity {
             tvRain.setText("");
             return;
         }
+        ExplorerViewModel.Settings s = viewModel.getSettings().getValue();
+        boolean fahrenheit = s != null && s.fahrenheit;
+        String unit = fahrenheit ? "°F" : "°C";
+
         // A V1 pede "hoje" — o primeiro item da lista diária (forecast_days=1) é hoje
         DailyForecast today = r.data.get(0);
-        tvMax.setText(getString(R.string.compare_max_temp, today.tempMax));
-        tvMin.setText(getString(R.string.compare_min_temp, today.tempMin));
+        tvMax.setText(String.format(Locale.getDefault(), "Max: %.1f %s", today.tempMax, unit));
+        tvMin.setText(String.format(Locale.getDefault(), "Min: %.1f %s", today.tempMin, unit));
         tvRain.setText(getString(R.string.compare_rain, today.rainProbability));
     }
 

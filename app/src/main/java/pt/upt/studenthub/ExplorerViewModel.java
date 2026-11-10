@@ -62,8 +62,8 @@ public class ExplorerViewModel extends ViewModel {
     private final MutableLiveData<List<HourlyForecast>> hourly = new MutableLiveData<>();
 
     // Favoritos e definições (em memória — persistem só até fechar a app, como o enunciado pede)
-    private final MutableLiveData<Set<String>> favourites = new MutableLiveData<>(Collections.emptySet());
-    private final MutableLiveData<Settings> settings = new MutableLiveData<>(
+    private static final MutableLiveData<Set<String>> favourites = new MutableLiveData<>(Collections.emptySet());
+    private static final MutableLiveData<Settings> settings = new MutableLiveData<>(
             new Settings(false, 7, 30, true, 300));
 
     private Future<?> currentTask;
@@ -76,6 +76,10 @@ public class ExplorerViewModel extends ViewModel {
     public LiveData<List<HourlyForecast>> getHourly() { return hourly; }
     public LiveData<Set<String>> getFavourites() { return favourites; }
     public LiveData<Settings> getSettings() { return settings; }
+
+    private static final MutableLiveData<String> studentName = new MutableLiveData<>("");
+    public LiveData<String> getStudentName() { return studentName; }
+    public void setStudentName(String name) { studentName.setValue(name); }
 
     // ---------- LISTA (pedido A) ----------
     /** Chamado na UI thread. Carrega os dias com as definições atuais. */
@@ -195,7 +199,7 @@ public class ExplorerViewModel extends ViewModel {
             comparePool.submit(() -> {
                 CompareResult r;
                 try {
-                    ExplorerViewModel.Settings s = settings.getValue();
+                    Settings s = settings.getValue();
                     boolean fah = s != null && s.fahrenheit;
                     String url = ExplorerApi.dailyUrl(coords[idx][0], coords[idx][1], 1, fah);
                     String body = HttpClient.get(url);

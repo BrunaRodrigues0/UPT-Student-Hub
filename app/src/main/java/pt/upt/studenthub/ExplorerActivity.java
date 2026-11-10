@@ -152,11 +152,18 @@ public class ExplorerActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
+
         String name = getIntent().getStringExtra(TimetableActivity.EXTRA_STUDENT_NAME);
-        if (name == null) name = "";
+        if (name != null && !name.trim().isEmpty()) {
+            viewModel.setStudentName(name);
+        }
 
         TextView tvGreeting = findViewById(R.id.tvGreeting);
-        tvGreeting.setText(getString(R.string.explorer_greeting, name));
+        viewModel.getStudentName().observe(this, n -> {
+            String studentName = (n == null) ? "" : n;
+            tvGreeting.setText(getString(R.string.explorer_greeting, studentName));
+        });
 
         tvStatus = findViewById(R.id.tvStatus);
         tvOffline = findViewById(R.id.tvOffline);
@@ -187,7 +194,11 @@ public class ExplorerActivity extends AppCompatActivity {
         adapter = new ItemAdapter(this, new ArrayList<>());
         listView.setAdapter(adapter);
 
-        viewModel = new ViewModelProvider(this).get(ExplorerViewModel.class);
+        viewModel.getSettings().observe(this, s -> {
+            if (s != null) {
+                adapter.setFahrenheit(s.fahrenheit);
+            }
+        });
         connectivityManager = ContextCompat.getSystemService(this, ConnectivityManager.class);
 
         btnRefresh.setOnClickListener(v -> viewModel.load());
@@ -364,7 +375,12 @@ public class ExplorerActivity extends AppCompatActivity {
         switch (s) {
             case IDLE:      tvStatus.setText(R.string.status_idle_explorer); break;
             case LOADING:   tvStatus.setText(R.string.status_loading_explorer); break;
-            case SUCCESS:   tvStatus.setText(getString(R.string.status_success_explorer, adapter.getCount())); break;
+            case SUCCESS: {
+                List<DailyForecast> list = viewModel.getDaily().getValue();
+                int count = (list != null && !list.isEmpty()) ? list.size() : adapter.getCount();
+                tvStatus.setText(getString(R.string.status_success_explorer, count));
+                break;
+            }
             case EMPTY:     tvStatus.setText(R.string.status_empty_explorer); break;
             case CANCELLED: tvStatus.setText(R.string.status_cancelled_explorer); break;
             case ERROR:     tvStatus.setText(R.string.status_error_explorer); break;

@@ -11,8 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -34,6 +36,7 @@ public class ItemAdapter extends ArrayAdapter<DailyForecast> {
     private final Context context;
     private final List<DailyForecast> items;
     private Set<String> favourites = new HashSet<>();
+    private boolean fahrenheit = false;
 
     public ItemAdapter(@NonNull Context context, @NonNull List<DailyForecast> items) {
         super(context, 0, items);
@@ -44,6 +47,11 @@ public class ItemAdapter extends ArrayAdapter<DailyForecast> {
     /** A Explorer passa aqui o conjunto de favoritos para mostrar/esconder o ícone. */
     public void setFavourites(@Nullable Set<String> favourites) {
         this.favourites = favourites == null ? new HashSet<>() : favourites;
+        notifyDataSetChanged();
+    }
+
+    public void setFahrenheit(boolean fahrenheit) {
+        this.fahrenheit = fahrenheit;
         notifyDataSetChanged();
     }
 
@@ -68,10 +76,10 @@ public class ItemAdapter extends ArrayAdapter<DailyForecast> {
 
         DailyForecast d = items.get(position);
 
+        String unit = fahrenheit ? "°F" : "°C";
         h.date.setText(formatDate(d.date));
         h.description.setText(WeatherCodes.describe(d.weatherCode));
-        h.temps.setText(context.getString(R.string.day_max_temp, d.tempMax)
-                + " · " + context.getString(R.string.day_min_temp, d.tempMin));
+        h.temps.setText(String.format(Locale.getDefault(), "Max: %.1f %s · Min: %.1f %s", d.tempMax, unit, d.tempMin, unit));
         h.rain.setText(context.getString(R.string.day_rain_prob, d.rainProbability));
 
         h.icon.setImageResource(iconForCode(d.weatherCode));
@@ -91,9 +99,9 @@ public class ItemAdapter extends ArrayAdapter<DailyForecast> {
         // Simples e sem dependências: mostra ISO ou uma versão curta legível
         if (iso == null || iso.length() < 10) return iso == null ? "" : iso;
         try {
-            java.time.LocalDate d = java.time.LocalDate.parse(iso);
+            LocalDate d = LocalDate.parse(iso);
             return d.getDayOfWeek().toString().substring(0, 3)
-                    + " " + String.format(java.util.Locale.getDefault(),
+                    + " " + String.format(Locale.getDefault(),
                     "%02d/%02d", d.getDayOfMonth(), d.getMonthValue());
         } catch (Exception e) {
             return iso;
