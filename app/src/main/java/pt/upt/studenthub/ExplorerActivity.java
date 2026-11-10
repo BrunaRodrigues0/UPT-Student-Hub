@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Ecrã principal do Módulo 3 «Explorer».
@@ -324,7 +325,8 @@ public class ExplorerActivity extends AppCompatActivity {
         refreshHandler.removeCallbacks(refreshRunnable);
         ExplorerViewModel.Settings s = viewModel.getSettings().getValue();
         if (s == null || !s.autoRefresh || batteryLow) return;
-        refreshHandler.postDelayed(refreshRunnable, s.refreshIntervalSec * 1000L);
+        long intervalSec = s.refreshIntervalSec > 0 ? s.refreshIntervalSec : 300L;
+        refreshHandler.postDelayed(refreshRunnable, intervalSec * 1000L);
     }
 
     // ---------- Painel (paisagem) ----------
@@ -350,14 +352,18 @@ public class ExplorerActivity extends AppCompatActivity {
         }
         ExplorerViewModel.Settings s = viewModel.getSettings().getValue();
         int threshold = s == null ? 30 : s.rainThreshold;
+        boolean fahrenheit = s != null && s.fahrenheit;
+        String unit = fahrenheit ? "°F" : "°C";
         int pad = getResources().getDimensionPixelSize(R.dimen.spacing_xs);
         for (HourlyForecast h : hours) {
             TextView tv = new TextView(this);
             if (h.rainProbability >= threshold) {
-                tv.setText(getString(R.string.detail_hour_rain_alert, h.hour(), h.temperature, h.rainProbability));
+                tv.setText(String.format(Locale.getDefault(), "%s · %.1f %s · %d%% rain (alert)",
+                        h.hour(), h.temperature, unit, h.rainProbability));
                 tv.setTextColor(ContextCompat.getColor(this, R.color.upt_error));
             } else {
-                tv.setText(getString(R.string.detail_hour_temp, h.hour(), h.temperature)
+                tv.setText(String.format(Locale.getDefault(), "%s · %.1f %s", h.hour(), h.temperature, unit)
+                        + " · " + getString(WeatherCodes.describe(h.weatherCode))
                         + " · " + getString(R.string.detail_hour_rain, h.rainProbability));
             }
             tv.setMinHeight(getResources().getDimensionPixelSize(R.dimen.touch_target));

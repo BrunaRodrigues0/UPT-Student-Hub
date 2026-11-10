@@ -73,10 +73,10 @@
     <string name="settings_rain_threshold">Rain alert threshold (%)</string>
     <string name="settings_rain_threshold_hint">0–100</string>
     <string name="settings_refresh_interval">Auto-refresh interval (seconds)</string>
-    <string name="settings_refresh_interval_hint">60–3600</string>
+    <string name="settings_refresh_interval_hint">60–86400</string>
     <string name="settings_save">Save</string>
     <string name="settings_error_threshold">Enter a number between 0 and 100</string>
-    <string name="settings_error_interval">Enter a number between 60 and 3600</string>
+    <string name="settings_error_interval">Enter a number between 60 and 86400</string>
     <string name="settings_saved_toast">Settings saved</string>
 
     <!-- CompareActivity -->

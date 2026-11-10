@@ -69,8 +69,8 @@ public class SettingsActivity extends AppCompatActivity {
                 return;
             }
             int intervalVal = parseOrMinus(etInterval.getText().toString(), -1);
-            if (intervalVal < 60 || intervalVal > 3600) {
-                etInterval.setError(getString(R.string.settings_error_interval));
+            if (intervalVal < 60 || intervalVal > 86400) {
+                etInterval.setError("Enter a number between 60 and 86400");
                 return;
             }
 
