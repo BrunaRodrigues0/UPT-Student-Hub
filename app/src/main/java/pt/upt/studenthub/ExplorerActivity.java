@@ -297,6 +297,9 @@ public class ExplorerActivity extends AppCompatActivity {
             if (scale > 0) {
                 float pct = (level * 100f) / scale;
                 batteryLow = (pct <= 15.0f);
+                if (batteryLow) {
+                    Toast.makeText(this, R.string.toast_battery_low, Toast.LENGTH_SHORT).show();
+                }
             }
         }
 
@@ -305,7 +308,7 @@ public class ExplorerActivity extends AppCompatActivity {
         batteryFilter.addAction(Intent.ACTION_BATTERY_LOW);
         batteryFilter.addAction(Intent.ACTION_BATTERY_OKAY);
         ContextCompat.registerReceiver(this, batteryReceiver, batteryFilter,
-                ContextCompat.RECEIVER_NOT_EXPORTED);
+                ContextCompat.RECEIVER_EXPORTED);
         // Rede
         setOnline(isOnlineNow());
         connectivityManager.registerDefaultNetworkCallback(networkCallback);
@@ -418,7 +421,11 @@ public class ExplorerActivity extends AppCompatActivity {
             }
             case EMPTY:     tvStatus.setText(R.string.status_empty_explorer); break;
             case CANCELLED: tvStatus.setText(R.string.status_cancelled_explorer); break;
-            case ERROR:     tvStatus.setText(R.string.status_error_explorer); break;
+            case ERROR: {
+                ExplorerViewModel.ErrorType err = viewModel.getError().getValue();
+                tvStatus.setText(errorMessage(err));
+                break;
+            }
         }
         invalidateOptionsMenu();
     }
@@ -453,6 +460,7 @@ public class ExplorerActivity extends AppCompatActivity {
         boolean loading = viewModel.getStatus().getValue() == ExplorerViewModel.Status.LOADING;
         menu.findItem(R.id.action_refresh).setEnabled(!loading);
         menu.findItem(R.id.action_compare).setEnabled(!loading);
+        menu.findItem(R.id.action_server_error).setEnabled(!loading);
 
         ExplorerViewModel.LocationInfo loc = viewModel.getSelectedLocation().getValue();
         if (loc != null) {
@@ -490,6 +498,10 @@ public class ExplorerActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_about) { AboutDialog.show(this); return true; }
+        if (id == R.id.action_server_error) {
+            viewModel.loadBrokenUrl();
+            return true;
+        }
         if (id == R.id.action_location_porto) {
             item.setChecked(true);
             viewModel.setSelectedLocation(new ExplorerViewModel.LocationInfo("Porto (UPT campus)", ExplorerApi.PORTO_LAT, ExplorerApi.PORTO_LON));

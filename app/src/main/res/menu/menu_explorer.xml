@@ -37,6 +37,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_server_error"
+        android:title="@string/menu_server_error"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_about"
         android:title="@string/menu_about"
         android:icon="@drawable/ic_about"

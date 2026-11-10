@@ -117,6 +117,40 @@ public class ExplorerViewModel extends ViewModel {
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {
             try {
+                Thread.sleep(1500); // Simula atraso para facilitar o teste de cancelamento (T4)
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
+                String body = HttpClient.get(url);
+                List<DailyForecast> result = ExplorerParser.parseDaily(body);
+                mainHandler.post(() -> {
+                    if (result == null || result.isEmpty()) {
+                        status.setValue(Status.EMPTY);
+                    } else {
+                        daily.setValue(result);
+                        status.setValue(Status.SUCCESS);
+                    }
+                });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (HttpClient.HttpStatusException e) {
+                postError(ErrorType.HTTP, e.code);
+            } catch (SocketTimeoutException e) {
+                postError(ErrorType.TIMEOUT, 0);
+            } catch (IOException e) {
+                postError(ErrorType.NO_CONNECTION, 0);
+            } catch (JSONException e) {
+                postError(ErrorType.PARSE, 0);
+            }
+        });
+    }
+
+    public void loadBrokenUrl() {
+        if (status.getValue() == Status.LOADING) return;
+        final String url = "https://api.open-meteo.com/v1/forecast-does-not-exit-broken";
+        status.setValue(Status.LOADING);
+        currentTask = executor.submit(() -> {
+            try {
                 String body = HttpClient.get(url);
                 List<DailyForecast> result = ExplorerParser.parseDaily(body);
                 mainHandler.post(() -> {
@@ -162,6 +196,10 @@ public class ExplorerViewModel extends ViewModel {
         status.setValue(Status.LOADING);
         currentTask = executor.submit(() -> {
             try {
+                Thread.sleep(1500); // Simula atraso para facilitar o teste de cancelamento (T4)
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
                 String body = HttpClient.get(url);
                 List<HourlyForecast> result = ExplorerParser.parseHourly(body);
                 mainHandler.post(() -> {
@@ -172,6 +210,8 @@ public class ExplorerViewModel extends ViewModel {
                         status.setValue(Status.SUCCESS);
                     }
                 });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             } catch (HttpClient.HttpStatusException e) {
                 postError(ErrorType.HTTP, e.code);
             } catch (SocketTimeoutException e) {

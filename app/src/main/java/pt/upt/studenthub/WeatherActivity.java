@@ -112,7 +112,7 @@ public class WeatherActivity extends AppCompatActivity {
         super.onStart();
         ContextCompat.registerReceiver(this, airplaneModeReceiver,
                 new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED),
-                ContextCompat.RECEIVER_NOT_EXPORTED);
+                ContextCompat.RECEIVER_EXPORTED);
         setOnline(isOnlineNow());
         connectivityManager.registerDefaultNetworkCallback(networkCallback);
     }
